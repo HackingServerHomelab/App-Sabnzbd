@@ -14,14 +14,13 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=America/Chicago
-  nginx:
-    image: nginx:latest
-    container_name: nginx
-    hostname: nginx
-    restart: unless-stopped
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ../Config/nginx.conf:/etc/nginx/nginx.conf
-      - ../Data/nginx:/etc/ssl/private
+    labels:
+      # Traefik Labels
+      - "traefik.enable=true"
+      # HTTPS Labels
+      - "traefik.http.routers.sabnzbd.rule=Host(`localhost`)" # Domain Name
+      - "traefik.http.routers.sabnzbd.entrypoints=web-secure"
+      - "traefik.http.routers.sabnzbd.middlewares=default-headers@file"
+      - "traefik.http.routers.sabnzbd.service=sabnzbd"
+      - "traefik.http.routers.sabnzbd.tls=true"
+      - "traefik.http.services.sabnzbd.loadbalancer.server.port=8080" # Proxied Port
